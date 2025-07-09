@@ -51,13 +51,14 @@ class _ToDoAppState extends State<ToDoApp> {
   }
 
   Future<void> storeItems() async {
-    final prefs = await SharedPreferences.getInstance();
+    try{
+      final prefs = await SharedPreferences.getInstance();
     final List<Map<String, dynamic>> itemsList =
         brandNames
             .map(
               (item) => {
                 'id': item.id,
-                'text': item.itemsText,
+                'itemsText': item.itemsText,
                 'isDone': item.isDone,
               },
             )
@@ -65,11 +66,16 @@ class _ToDoAppState extends State<ToDoApp> {
     prefs.setString('items', jsonEncode(itemsList));
     if (kDebugMode) {
       print('Saved to SharedPreferences: ${jsonEncode(itemsList)}');
+    } 
+  } catch (e){
+    if (kDebugMode){
+      print('Error Saving : $e');
+    }
     }
   }
 
   Future<void> loadItems() async {
-    final prefs = await SharedPreferences.getInstance();
+    try {final prefs = await SharedPreferences.getInstance();
     final String? itemsData = prefs.getString('items');
     if (kDebugMode) {
       print('Loaded from SharedPreferences: $itemsData');
@@ -90,6 +96,11 @@ class _ToDoAppState extends State<ToDoApp> {
         );
         filteredItems = List.from(brandNames);
       });
+    }
+    } catch (e){
+      if (kDebugMode){
+        print('Error : $e');
+      }
     }
   }
 
@@ -118,7 +129,7 @@ class _ToDoAppState extends State<ToDoApp> {
                           ),
                         ),
                       ),
-                      ...(filteredItems.isEmpty
+                      ...(brandNames.isEmpty
                           ? [
                             SizedBox(height: 80),
                             Center(
